@@ -98,10 +98,10 @@ export class PlanetWalk extends Scene {
         // don't know if the planet position was changed so i'll use the other one
         // this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffffff")}));
 
-        this.drawShapes(this.suns.getSuns(),context, program_state, model_transform)
+        this.drawShapes(this.suns.getSuns(),context, program_state, model_transform_planet)
         this.suns.updatePosition()
        
-        this.shapes.Planet.draw(context, program_state, model_transform, this.materials.phong.override({color: hex_color("#ffff00")}));
+        this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.phong.override({color: hex_color("#ffff00")}));
 
     }
 }
