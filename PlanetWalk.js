@@ -21,7 +21,9 @@ export class PlanetWalk extends Scene {
         this.shapes = {
             box_1: new Cube(),
             box_2: new Cube(), 
-            Planet: new Subdivision_Sphere(4)
+            Planet: new Subdivision_Sphere(4),
+            character_body: new Subdivision_Sphere(4),
+            character_head: new Subdivision_Sphere(4),
         }
 
 
@@ -30,10 +32,14 @@ export class PlanetWalk extends Scene {
                 ambient: 0.2,
                 color: hex_color("#ffffff"),
             }),
-            texture: new Material(new Textured_Phong(), {
+            planet_surface: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
                 ambient: 0.5, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/stars.png")
+            }),
+            character: new Material(new Textured_Phong(), {
+                ambient: 0.2,
+                color: hex_color("000000"),
+                texture: new Texture("assets/11.png")
             }),
         }
 
@@ -47,7 +53,7 @@ export class PlanetWalk extends Scene {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
-            program_state.set_camera(Mat4.translation(0, 0, -8));
+            program_state.set_camera(Mat4.translation(0, -1, -2));
         }
 
         program_state.projection_transform = Mat4.perspective(
@@ -57,10 +63,19 @@ export class PlanetWalk extends Scene {
         program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
 
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
-        let model_transform = Mat4.identity();
+        let model_transform_planet = Mat4.identity();
 
-       
-        this.shapes.Planet.draw(context, program_state, model_transform, this.materials.phong.override({color: hex_color("#ffff00")}));
+        // Character matrices
+        let model_transform_character = model_transform_planet;
+        model_transform_character = model_transform_character.times(Mat4.translation(0,1.1,0));
+        model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1));
+        let model_transform_character_head = model_transform_character;
+        model_transform_character_head = model_transform_character_head.times(Mat4.translation(0,1,0));
+        model_transform_character_head = model_transform_character_head.times(Mat4.scale(0.5,0.5,0.5));
+
+        this.shapes.character_body.draw(context, program_state, model_transform_character, this.materials.character);
+        this.shapes.character_head.draw(context, program_state, model_transform_character_head, this.materials.character);
+        this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffffff")}));
     }
 }
 
