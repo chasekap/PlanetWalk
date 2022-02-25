@@ -1,4 +1,5 @@
 import {defs, tiny} from './examples/common.js';
+import { ShootingStars } from './ShootingStars.js';
 import { Suns } from './Suns.js';
 
 const {
@@ -20,6 +21,7 @@ export class PlanetWalk extends Scene {
         //        texture coordinates as required for cube #2.  You can either do this by modifying the cube code or by modifying
         //        a cube instance's texture_coords after it is already created.
         this.suns = new Suns(); 
+        this.shootingStars = new ShootingStars(); 
 
         this.shapes = {
             box_1: new Cube(),
@@ -60,7 +62,7 @@ export class PlanetWalk extends Scene {
             }
             model_transform = model_transform.times(Mat4.translation(shape.x,shape.y,shape.z))
             model_transform = model_transform.times(Mat4.scale(shape.size,shape.size,shape.size))
-            this.shapes.Planet.draw(context, program_state, model_transform, shape.material.override({color: hex_color(shape.color)}))
+            this.shapes.Planet.draw(context, program_state, model_transform, shape.material.override({color: shape.color}))
            // program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
             model_transform = model_transform.times(Mat4.scale(1/shape.size,1/shape.size,1/shape.size))
             model_transform = model_transform.times(Mat4.translation(-1*shape.x,-1*shape.y,-1*shape.z))
@@ -130,9 +132,13 @@ export class PlanetWalk extends Scene {
         this.shapes.character_head.draw(context, program_state, model_transform_character_head, this.materials.character);
         // don't know if the planet position was changed so i'll use the other one
         // this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffffff")}));
-
+        this.shootingStars.rngStars()
+        
+        this.drawShapes(this.shootingStars.getStars(),context, program_state, model_transform_planet)
         this.drawShapes(this.suns.getSuns(),context, program_state, model_transform_planet)
         this.suns.updatePosition()
+        this.shootingStars.moveStars()
+    
        
         this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
 

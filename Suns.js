@@ -1,6 +1,6 @@
 
 import {defs, tiny} from './examples/common.js';
-import { PlanetWalk } from './PlanetWalk.js';
+
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -27,14 +27,12 @@ export class Suns {
     }
 
     this.shapes = {
-        box_1: new Cube(),
-        box_2: new Cube(), 
         Sun: new Subdivision_Sphere(4)
     }
 
     this.sun1 = {
         size: 8, 
-        color: "#FFFFFF", 
+        color: hex_color("#FFFFFF"), 
         light: {brightness: 1000}, 
         dist_from_center: this.DIST_FROM_CENTER, 
         angle: Math.PI / 2, 
@@ -43,7 +41,7 @@ export class Suns {
 
     this.sun2 = {
         size: 7, 
-        color: "#CCCCFF", 
+        color: hex_color("#CCCCFF"), 
         light: {brightness: 1000}, 
         dist_from_center: this.DIST_FROM_CENTER, 
         angle: 3 * Math.PI / 2, 
@@ -59,13 +57,13 @@ export class Suns {
     }
 
     getSuns(){
-    const sunOne = this.convertSunToXYZ(this.sun1)
-    const sunTwo = this.convertSunToXYZ(this.sun2)
+    const sunOne = this.convertSunToXYZShape(this.sun1)
+    const sunTwo = this.convertSunToXYZShape(this.sun2)
     return [sunOne, sunTwo]
     }
     
 
-    convertSunToXYZ(sun){
+    convertSunToXYZShape(sun){
         return {
             x: this.orbitCenter.dist_from_planet * Math.cos(this.orbitCenter.angle) + 
                sun.dist_from_center * Math.cos(sun.angle), 
