@@ -5,7 +5,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
-const {Cube, Axis_Arrows, Textured_Phong,Subdivision_Sphere} = defs
+const {Cube, Phong_Shader, Textured_Phong,Subdivision_Sphere} = defs
 
 export class PlanetWalk extends Scene {
     /**
@@ -31,21 +31,19 @@ export class PlanetWalk extends Scene {
 
 
         this.materials = {
-            phong: new Material(new Textured_Phong(), {
-                ambient: 0.1,
-                diffusivity: 0.5,
-                color: hex_color("#ffffff"),
-            }),
             planet_surface: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.5, diffusivity: 0.5, specularity: 0.1,
+                ambient: 0.1, diffusivity: 0.5, specularity: 0.5,
             }),
             character: new Material(new Textured_Phong(), {
                 ambient: 0.2,
                 color: hex_color("000000"),
                 texture: new Texture("assets/11.png")
             }),
-        }
+            test: new Material(new Phong_Shader, {
+                ambient: 0.1,
+                diffusivity: 1
+        })}
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.moveforward = 0;
@@ -56,12 +54,13 @@ export class PlanetWalk extends Scene {
   
     drawShapes(listOfShapes,context, program_state, model_transform){
         listOfShapes.forEach((shape) => {
+            console.log(shape)
             if (shape.light){
-                program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 100000000 ))
+                program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 100000 ))
             }
             model_transform = model_transform.times(Mat4.translation(shape.x,shape.y,shape.z))
             model_transform = model_transform.times(Mat4.scale(shape.size,shape.size,shape.size))
-            this.shapes.Planet.draw(context, program_state, model_transform, this.materials.phong.override({color: hex_color(shape.color)}))
+            this.shapes.Planet.draw(context, program_state, model_transform, shape.material.override({color: hex_color(shape.color)}))
            // program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
             model_transform = model_transform.times(Mat4.scale(1/shape.size,1/shape.size,1/shape.size))
             model_transform = model_transform.times(Mat4.translation(-1*shape.x,-1*shape.y,-1*shape.z))
@@ -135,7 +134,7 @@ export class PlanetWalk extends Scene {
         this.drawShapes(this.suns.getSuns(),context, program_state, model_transform_planet)
         this.suns.updatePosition()
        
-        this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.phong.override({color: hex_color("#ffff00")}));
+        this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
 
     }
 }
