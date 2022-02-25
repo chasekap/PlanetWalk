@@ -85,7 +85,10 @@ export class PlanetWalk extends Scene {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
-            program_state.set_camera(Mat4.translation(0, -1.1, -1.6));
+            //program_state.set_camera(Mat4.translation(0, -1.1, -1.6));
+            program_state.set_camera(Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90))))
         }
 
         program_state.projection_transform = Mat4.perspective(
@@ -103,21 +106,37 @@ export class PlanetWalk extends Scene {
         // Character matrices
         if (this.moveforward) {
             this.moveforward = 0;
-            this.currentAngle -= 0.1;
+            this.currentAngle += 0.1;
             // working on the camera stuff following the character
 
-            // program_state.set_camera(Mat4.look_at(vec3(1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle) + 1,1),
-            //     vec3(0,0,0), vec3(-(1.1 * Math.cos(this.currentAngle)),-(1.1 * Math.sin(this.currentAngle) + 1),-1)));
+            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
+
+            program_state.set_camera(desired2.map((x, i) =>
+            Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
+
+            //program_state.set_camera(Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                     //vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                     //vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle))));
             // this.character_model_transform = this.character_model_transform.times(Mat4.rotation(1, 0, -1, 0))
             //     .times(Mat4.translation());
-            // let desired = this.character_model_transform.times(Mat4.translation(0, 4.2, 4.6));
-            // desired = Mat4.inverse(desired);
-            // program_state.set_camera(desired.map((x, i) =>
-            // Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
+            //let desired = model_transform_character.times(Mat4.translation(0, 3.2, 3.6));
+            //desired = Mat4.inverse(desired);
+            //program_state.set_camera(desired.map((x, i) =>
+            //Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
+            // program_state.camera_transform.
         }
         if (this.movebackward) {
             this.movebackward = 0;
-            this.currentAngle += 0.1;
+            this.currentAngle -= 0.1;
+
+            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
+
+            program_state.set_camera(desired2.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
         }
 
         // draw head on character
