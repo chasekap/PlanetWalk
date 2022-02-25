@@ -50,6 +50,8 @@ export class PlanetWalk extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.moveforward = 0;
         this.movebackward = 0;
+        this.moveRight = 0;
+        this.moveLeft = 0;
         this.currentAngle = 0;
     }
 
