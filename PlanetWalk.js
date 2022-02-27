@@ -48,29 +48,27 @@ export class PlanetWalk extends Scene {
         })}
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
-        this.moveforward = 0;
-        this.movebackward = 0;
-        this.moveRight = 0;
-        this.moveLeft = 0;
+        this.moveforward = false;
+        this.movebackward = false;
+        this.moveRight = false;
+        this.moveLeft = false;
         this.currentAngle = 0;
     }
 
   
-    drawShapes(listOfShapes,context, program_state, model_transform){
+    drawShapes(listOfShapes, context, program_state, model_transform){
         listOfShapes.forEach((shape) => {
-            console.log(shape)
-            if (shape.light){
-                program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 100000 ))
-            }
-            model_transform = model_transform.times(Mat4.translation(shape.x,shape.y,shape.z))
-            model_transform = model_transform.times(Mat4.scale(shape.size,shape.size,shape.size))
-            this.shapes.Planet.draw(context, program_state, model_transform, shape.material.override({color: shape.color}))
-           // program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
-            model_transform = model_transform.times(Mat4.scale(1/shape.size,1/shape.size,1/shape.size))
-            model_transform = model_transform.times(Mat4.translation(-1*shape.x,-1*shape.y,-1*shape.z))
-            
 
-            
+            if (shape.light){
+                program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 100000 ));
+            }
+
+            model_transform = model_transform.times(Mat4.translation(shape.x,shape.y,shape.z));
+            model_transform = model_transform.times(Mat4.scale(shape.size,shape.size,shape.size));
+            this.shapes.Planet.draw(context, program_state, model_transform, shape.material.override({color: shape.color}));
+           // program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
+            model_transform = model_transform.times(Mat4.scale(1/shape.size,1/shape.size,1/shape.size));
+            model_transform = model_transform.times(Mat4.translation(-1*shape.x,-1*shape.y,-1*shape.z));
         })
     }
     // control panel for movement back and forth
@@ -79,8 +77,17 @@ export class PlanetWalk extends Scene {
         this.key_triggered_button("Character forward", ["i"], () => {
             this.moveforward = !this.moveforward;
         });
+
         this.key_triggered_button("Character backward", ["k"], () => {
             this.movebackward = !this.movebackward;
+        });
+
+        this.key_triggered_button("Character right", ["l"], () => {
+            this.moveRight = !this.moveRight;
+        });
+
+        this.key_triggered_button("Character left", ["l"], () => {
+            this.moveLeft = !this.moveLeft;
         });
     }
 
@@ -107,6 +114,22 @@ export class PlanetWalk extends Scene {
         model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1));
         model_transform_character = model_transform_character.times(Mat4.rotation(this.currentAngle, 1, 0, 0))
             .times(Mat4.translation(0,11,0));
+
+        const movement_velocity = 2;
+        const movement_deceleration = -0.5;
+        const g_constant = -9.8;
+
+        if (this.moveforward) {
+            //this.moveforward = !this.moveforward;
+            let character_velocity = movement_velocity - movement_deceleration*t;
+            let y_pos = character_velocity * t;
+            console.log(model_transform_character);
+            console.log(x_pos);
+            model_transform_character = model_transform_character.times(Mat4.translation(0, y_pos, 0));
+        }
+        
+        /*
+
         // Character matrices
         if (this.moveforward) {
             this.moveforward = 0;
@@ -131,6 +154,7 @@ export class PlanetWalk extends Scene {
             //Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
             // program_state.camera_transform.
         }
+
         if (this.movebackward) {
             this.movebackward = 0;
             this.currentAngle -= 0.1;
@@ -142,6 +166,20 @@ export class PlanetWalk extends Scene {
             program_state.set_camera(desired2.map((x, i) =>
                 Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
         }
+
+        if(this.moveRight) {
+            this.moveRight = 0;
+            this.currentAngle -= 0.10; // idk have to fix this still
+
+            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
+
+            program_state.set_camera(desired2.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
+        }
+
+        */
 
         // draw head on character
         let model_transform_character_head = model_transform_character;
