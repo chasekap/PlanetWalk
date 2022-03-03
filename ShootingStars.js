@@ -6,7 +6,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,Color
 } = tiny;
 
-const {Cube, Phong_Shader,Subdivision_Sphere} = defs
+const {Cube, Phong_Shader, Subdivision_Sphere} = defs
 
 export class ShootingStars{
     constructor() {
