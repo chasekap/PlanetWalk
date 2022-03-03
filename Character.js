@@ -37,32 +37,37 @@ export class Character {
         let angle = 0;
         const mov_velocity = 2;
         const mov_acceleratetion = -0.5;
-        const g = -9.8;
+        const jump_velocity = 6;
+        let character_v = mov_velocity - mov_acceleratetion*t;
+        const g = -2;
 
         let x_pos = 0;
         let y_pos = 0;
         let z_pos = 0;
 
         if (this.forward) {
-            this.forward = !this.forward;
-            let character_v = mov_velocity - mov_acceleratetion*t;
+            //this.forward = !this.forward;
             y_pos = character_v * t;
         }
 
         if (this.backward) {
             this.backward = !this.backward;
-
-
+            y_pos = -(character_v * t);
         }
 
         if (this.right) {
             this.right = !this.right;
-
+            x_pos = character_v * t;
         }
 
         if (this.left) {
             this.left = !this.left;
+            x_pos = -(character_v * t);
+        }
 
+        if (this.jump) {
+            this.jump = !this.jump;
+            z_pos = jump_velocity - (mov_acceleratetion*t);
         }
 
         return this.convertCharacterToSpherical(x_pos, y_pos, z_pos);

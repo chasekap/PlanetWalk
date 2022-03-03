@@ -32,13 +32,12 @@ export class PlanetWalk extends Scene {
         this.materials = {
             planet_surface: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 1, specularity: 0.5,
+                ambient: 0.1, diffusivity: 0, specularity: 0.5,
             })
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.currentAngle = 0;
-        this.move = 0;
     }
 
   
@@ -64,33 +63,28 @@ export class PlanetWalk extends Scene {
         // move forward with 'i'
         this.key_triggered_button("Move forward", ["i"], () => {
             this.character.forward = !this.character.forward;
-            this.move = !this.move;
         });
         this.new_line();
 
         // move to the right with 'j'
         this.key_triggered_button("Move left", ["j"], () => {
-            this.move = !this.move;
-            this.moveLeft = !this.moveLeft;
+            this.character.left = !this.character.right;
         });
 
         // move to the right with 'l'
         this.key_triggered_button("Move right", ["l"], () => {
-            this.move = !this.move;
             this.character.right = !this.character.right;
         });
         this.new_line();
 
         // move back with 'k'
         this.key_triggered_button("Move backward", ["k"], () => {
-            this.move = !this.move;
             this.character.backward = !this.character.backward;
         });
         this.new_line();
 
         // jump with ';'
         this.key_triggered_button("Jump", [";"], () => {
-            this.move = !this.move;
             this.character.jump = !this.character.jump;
         });
         this.new_line();
@@ -122,12 +116,10 @@ export class PlanetWalk extends Scene {
         model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1))
                                                              .times(Mat4.rotation(this.currentAngle, 1, 0, 0))
                                                              .times(Mat4.translation(0,11,0));
-                                                                     
-        if (this.move) {
-            let move_pos = this.character.moveCharacter(t);
-            model_transform_character = model_transform_character.times(Mat4.translation(move_pos.x, move_pos.y, move_pos.z));
-            this.move = !this.move;
-        }   
+
+        let move_pos = this.character.moveCharacter(t);
+        console.log(move_pos);
+        model_transform_character = model_transform_character.times(Mat4.translation(move_pos.x, move_pos.y, move_pos.z));
                                                                     
         // transform head on character
         let model_transform_character_head = model_transform_character;
@@ -135,18 +127,6 @@ export class PlanetWalk extends Scene {
                                                                        .times(Mat4.scale(0.5,0.5,0.5));
                                                                 
         /*                                                                      
-        const movement_velocity = 2;
-        const movement_deceleration = -0.5;
-        const g_constant = -9.8;
-
-        if (this.moveforward) {
-            //this.moveforward = !this.moveforward;
-            let character_velocity = movement_velocity - movement_deceleration*t;
-            let y_pos = character_velocity * t;
-            console.log(model_transform_character);
-            console.log(x_pos);
-            model_transform_character = model_transform_character.times(Mat4.translation(0, y_pos, 0));
-        }
 
         // Character matrices
         if (this.moveforward) {
