@@ -118,7 +118,7 @@ export class PlanetWalk extends Scene {
                                                              .times(Mat4.translation(0,11,0));
 
         let move_pos = this.character.moveCharacter(t);
-        console.log(move_pos);
+        // console.log(move_pos);
         model_transform_character = model_transform_character.times(Mat4.translation(move_pos.x, move_pos.y, move_pos.z));
                                                                     
         // transform head on character
@@ -185,12 +185,14 @@ export class PlanetWalk extends Scene {
 
         // don't know if the planet position was changed so i'll use the other one
         // this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffffff")}));
-        this.shootingStars.rngStars()
+        this.shootingStars.rngStars();
         
-        this.drawShapes(this.shootingStars.getStars(),context, program_state, model_transform_planet)
-        this.drawShapes(this.suns.getSuns(),context, program_state, model_transform_planet)
-        this.suns.updatePosition()
-        this.shootingStars.moveStars()
+        this.drawShapes(this.shootingStars.getStars(), context, program_state, model_transform_planet);
+        this.drawShapes(this.suns.getSuns(), context, program_state, model_transform_planet);
+        this.drawShapes(this.suns.stars, context, program_state, model_transform_planet);
+        
+        this.suns.updatePosition();
+        this.shootingStars.moveStars();
     
        
         this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
