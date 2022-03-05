@@ -24,6 +24,15 @@ export class Character {
                 texture: new Texture("assets/11.png")
             })
         }
+        this.coordinates = {
+            x: 0, 
+            y: 0, 
+            z: 0, 
+            r: 1, 
+            phi: 0, 
+            theta: 0
+        }
+
 
         this.forward = 0;
         this.backward = 0;
@@ -32,7 +41,9 @@ export class Character {
         this.jump = 0;
 
     }
-
+    getCoords(){
+        return this.coordinates
+    }
     moveCharacter(t) {
         let angle = 0;
         const mov_velocity = 2;
