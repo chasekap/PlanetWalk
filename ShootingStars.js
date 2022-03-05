@@ -20,7 +20,7 @@ export class ShootingStars{
         star: new Subdivision_Sphere(4)
     }
     this.material = new Material(new Phong_Shader, {
-        ambient: 0.8,
+        ambient: 1,
         diffusivity: 0, 
         specularity: 0
     })
@@ -32,7 +32,8 @@ export class ShootingStars{
            const star = {
                r: this.atmosphere_radius, 
                theta: Math.random() * Math.PI * 2 , 
-               phi: Math.random() * Math.PI
+               phi: Math.random() * Math.PI, 
+               color: Color.of(Math.max(Math.random(), 0.9), Math.max(Math.random(), 0.9),Math.max(Math.random(), 0.9),1)
            }
            this.ShootingStars.push(star)
        }
@@ -50,9 +51,10 @@ export class ShootingStars{
                 x: star.r * Math.cos(star.phi) * Math.sin(star.theta), 
                 y: star.r * Math.sin(star.phi) * Math.sin(star.theta), 
                 z: star.r * Math.cos(star.theta), 
-                color: Color.of(Math.max(Math.random(), 0.7), Math.max(Math.random(), 0.7),Math.max(Math.random(), 0.7),1),
+                color: star.color,
                 shape: this.shapes.star, 
                 material: this.material, 
+                light: true,
                 size: 0.1
             }
         })

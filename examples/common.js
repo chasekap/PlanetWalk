@@ -577,7 +577,7 @@ const Phong_Shader = defs.Phong_Shader =
         // at that pixel with the vectors toward the camera and light sources.
 
 
-        constructor(num_lights = 2) {
+        constructor(num_lights = 10) {
             super();
             this.num_lights = num_lights;
         }
@@ -724,6 +724,11 @@ const Textured_Phong = defs.Textured_Phong =
         // **Textured_Phong** is a Phong Shader extended to addditionally decal a
         // texture image over the drawn shape, lined up according to the texture
         // coordinates that are stored at each shape vertex.
+        constructor(num_lights = 10) {
+            super();
+            this.num_lights = num_lights;
+        }
+
         vertex_glsl_code() {
             // ********* VERTEX SHADER *********
             return this.shared_glsl_code() + `
