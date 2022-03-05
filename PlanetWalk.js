@@ -33,6 +33,10 @@ export class PlanetWalk extends Scene {
             planet_surface: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
                 ambient: 0.1, diffusivity: 0, specularity: 0.5,
+            }),
+            raw: new Material(new Phong_Shader(), {
+                color: hex_color("#ffffff"),
+                ambient: 0.1, diffusivity: 0, specularity: 0.3,
             })
         }
 
@@ -42,10 +46,15 @@ export class PlanetWalk extends Scene {
 
   
     drawShapes(listOfShapes, context, program_state, model_transform){
+       
         listOfShapes.forEach((shape) => {
 
             if (shape.light){
-                program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 100000 ));
+                program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 1000 ));
+            }
+            if (shape.trail){
+                console.log(shape.trail)
+                this.drawShapes(shape.trail, context,program_state,model_transform)
             }
 
             model_transform = model_transform.times(Mat4.translation(shape.x,shape.y,shape.z));
