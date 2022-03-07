@@ -7,7 +7,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
-const {Cube, Phong_Shader, Textured_Phong,Subdivision_Sphere} = defs
+const {Cube, Phong_Shader, Textured_Phong, Subdivision_Sphere} = defs
 
 export class PlanetWalk extends Scene {
     /**
@@ -31,8 +31,9 @@ export class PlanetWalk extends Scene {
 
         this.materials = {
             planet_surface: new Material(new Textured_Phong(), {
-                color: hex_color("#ffffff"),
+                color: hex_color("#006400"),
                 ambient: 0.1, diffusivity: 0, specularity: 0.5,
+                texture: new Texture("assets/terrain.jpg"),
             })
         }
 

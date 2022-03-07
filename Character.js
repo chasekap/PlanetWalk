@@ -5,7 +5,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,Color
 } = tiny;
 
-const {Textured_Phong, Subdivision_Sphere} = defs;
+const {Phong_Shader, Subdivision_Sphere} = defs;
 
 export class Character {
     constructor() {
@@ -18,10 +18,9 @@ export class Character {
         }
 
         this.materials = {
-            character: new Material(new Textured_Phong(), {
-                ambient: 0.2,
-                color: hex_color("000000"),
-                texture: new Texture("assets/11.png")
+            character: new Material(new Phong_Shader(), {
+                ambient: 0.5, diffusivity: 0, specularity: 0.5,
+                color: hex_color("C0C0C0"),
             })
         }
 
