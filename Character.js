@@ -5,7 +5,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,Color
 } = tiny;
 
-const {Textured_Phong, Subdivision_Sphere} = defs;
+const {Phong_Shader, Subdivision_Sphere} = defs;
 
 export class Character {
     constructor() {
@@ -18,10 +18,9 @@ export class Character {
         }
 
         this.materials = {
-            character: new Material(new Textured_Phong(), {
-                ambient: 0.2,
-                color: hex_color("000000"),
-                texture: new Texture("assets/11.png")
+            character: new Material(new Phong_Shader(), {
+                ambient: 0.5, diffusivity: 0, specularity: 0.5,
+                color: hex_color("C0C0C0"),
             })
         }
 
@@ -31,46 +30,98 @@ export class Character {
         this.left = 0;
         this.jump = 0;
 
+        this.x_pos = 0;
+        this.y_pos = 0;
+        this.z_pos = 0;
+
     }
 
     moveCharacter(t) {
         let angle = 0;
-        const mov_velocity = 2;
-        const mov_acceleratetion = -0.5;
+        const mov_velocity = .5;
+        const mov_acceleratetion = 0.5;
         const jump_velocity = 6;
         let character_v = mov_velocity - mov_acceleratetion*t;
-        const g = -2;
-
-        let x_pos = 0;
-        let y_pos = 0;
-        let z_pos = 0;
+        const g = 2;
 
         if (this.forward) {
-            //this.forward = !this.forward;
-            y_pos = character_v * t;
+            this.z_pos = character_v * t;
         }
 
         if (this.backward) {
-            this.backward = !this.backward;
-            y_pos = -(character_v * t);
+            this.z_pos = -(character_v * t);
         }
 
         if (this.right) {
-            this.right = !this.right;
-            x_pos = character_v * t;
+            this.x_pos = character_v * t;
         }
 
         if (this.left) {
-            this.left = !this.left;
-            x_pos = -(character_v * t);
+            this.x_pos = -(character_v * t);
         }
 
         if (this.jump) {
-            this.jump = !this.jump;
-            z_pos = jump_velocity - (mov_acceleratetion*t);
+            const start_y = this.y_pos;
+            this.y_pos = jump_velocity - (g*t);
+            if (start_y === this.y_pos) {
+                this.jump = !this.jump;
+            }
         }
 
-        return this.convertCharacterToSpherical(x_pos, y_pos, z_pos);
+        /*                                                                      
+
+        // Character matrices
+        if (this.moveforward) {
+            this.moveforward = 0;
+            this.currentAngle += 0.1;
+            // working on the camera stuff following the character
+
+            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
+
+            program_state.set_camera(desired2.map((x, i) =>
+            Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
+
+            //program_state.set_camera(Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                     //vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                     //vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle))));
+            // this.character_model_transform = this.character_model_transform.times(Mat4.rotation(1, 0, -1, 0))
+            //     .times(Mat4.translation());
+            //let desired = model_transform_character.times(Mat4.translation(0, 3.2, 3.6));
+            //desired = Mat4.inverse(desired);
+            //program_state.set_camera(desired.map((x, i) =>
+            //Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
+            // program_state.camera_transform.
+        }
+
+        if (this.movebackward) {
+            this.movebackward = 0;
+            this.currentAngle -= 0.1;
+
+            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
+
+            program_state.set_camera(desired2.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
+        }
+
+        if(this.moveRight) {
+            this.moveRight = 0;
+            this.currentAngle -= 0.10; // idk have to fix this still
+
+            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
+                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
+                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
+
+            program_state.set_camera(desired2.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
+        }
+
+        */
+
+        return this.convertCharacterToSpherical(this.x_pos, this.y_pos, this.z_pos);
     }
 
     convertCharacterToSpherical(x,y,z) {

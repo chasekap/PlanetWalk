@@ -7,7 +7,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
-const {Cube, Phong_Shader, Textured_Phong,Subdivision_Sphere} = defs
+const {Cube, Phong_Shader, Textured_Phong, Subdivision_Sphere} = defs
 
 export class PlanetWalk extends Scene {
     /**
@@ -31,12 +31,9 @@ export class PlanetWalk extends Scene {
 
         this.materials = {
             planet_surface: new Material(new Textured_Phong(), {
-                color: hex_color("#ffffff"),
+                color: hex_color("#006400"),
                 ambient: 0.1, diffusivity: 0, specularity: 0.5,
-            }),
-            raw: new Material(new Phong_Shader(), {
-                color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 0, specularity: 0.3,
+                texture: new Texture("assets/terrain.jpg"),
             })
         }
 
@@ -127,66 +124,12 @@ export class PlanetWalk extends Scene {
                                                              .times(Mat4.translation(0,11,0));
 
         let move_pos = this.character.moveCharacter(t);
-        // console.log(move_pos);
         model_transform_character = model_transform_character.times(Mat4.translation(move_pos.x, move_pos.y, move_pos.z));
                                                                     
         // transform head on character
         let model_transform_character_head = model_transform_character;
         model_transform_character_head = model_transform_character_head.times(Mat4.translation(0,1,0))
                                                                        .times(Mat4.scale(0.5,0.5,0.5));
-                                                                
-        /*                                                                      
-
-        // Character matrices
-        if (this.moveforward) {
-            this.moveforward = 0;
-            this.currentAngle += 0.1;
-            // working on the camera stuff following the character
-
-            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
-                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
-                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
-
-            program_state.set_camera(desired2.map((x, i) =>
-            Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
-
-            //program_state.set_camera(Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
-                     //vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
-                     //vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle))));
-            // this.character_model_transform = this.character_model_transform.times(Mat4.rotation(1, 0, -1, 0))
-            //     .times(Mat4.translation());
-            //let desired = model_transform_character.times(Mat4.translation(0, 3.2, 3.6));
-            //desired = Mat4.inverse(desired);
-            //program_state.set_camera(desired.map((x, i) =>
-            //Vector.from(program_state.camera_inverse[i]).mix(x, 0.1)));
-            // program_state.camera_transform.
-        }
-
-        if (this.movebackward) {
-            this.movebackward = 0;
-            this.currentAngle -= 0.1;
-
-            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
-                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
-                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
-
-            program_state.set_camera(desired2.map((x, i) =>
-                Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
-        }
-
-        if(this.moveRight) {
-            this.moveRight = 0;
-            this.currentAngle -= 0.10; // idk have to fix this still
-
-            let desired2 = Mat4.look_at(vec3(0, 3 * Math.cos(this.currentAngle), 3 * Math.sin(this.currentAngle)),
-                vec3(0, 1.1 * Math.cos(this.currentAngle),1.1 * Math.sin(this.currentAngle)),
-                vec3(0, 3 * Math.cos(this.currentAngle + 90), 3 * Math.sin(this.currentAngle + 90)));
-
-            program_state.set_camera(desired2.map((x, i) =>
-                Vector.from(program_state.camera_inverse[i]).mix(x, 0.2)));
-        }
-
-        */
 
         // draw character
         this.character.shapes.character_body.draw(context, program_state, model_transform_character, this.character.materials.character);
