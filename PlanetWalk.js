@@ -42,6 +42,7 @@ export class PlanetWalk extends Scene {
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.currentAngle = 0;
+        this.collisions = 0;
     }
     withinDistance(a,b, distance){
         //console.log( Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y)**2 - (a.z - b.z)**2))
@@ -50,7 +51,12 @@ export class PlanetWalk extends Scene {
     detectCollision(distance){
         this.shootingStars.getStars().forEach(star => {
             if (this.withinDistance(this.character.getCoords(), star, distance)){
-                console.log("COLLISION!"); 
+                this.collisions++;
+                alert("Collision!");
+                if (this.collisions >= 5) {
+                    alert("Too many collisions! Game over :( \n Would you like to restart?");
+                    this.collisions = 0;
+                }
             }
         })
     }
