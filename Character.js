@@ -24,48 +24,88 @@ export class Character {
             })
         }
 
-        this.forward = 0;
-        this.backward = 0;
-        this.right = 0;
-        this.left = 0;
-        this.jump = 0;
+        this.forward = false;
+        this.backward = false;
+        this.right = false;
+        this.left = false;
+        this.jump = false;
 
         this.x_pos = 0;
         this.y_pos = 0;
         this.z_pos = 0;
+
+        this.time = 0;
+    }
+
+    stopMovement(move){
+
+        if (move === 'forward'){
+            this.backward = false;
+            this.left = false;
+            this.right = false;
+        }
+
+        if (move === 'backward'){
+            this.forward = false;
+            this.left = false;
+            this.right = false;
+        }
+
+        if (move === 'left'){
+            this.forward = false;
+            this.backward = false;
+            this.right = false;
+        }
+
+        if (move === 'right'){
+            this.forward = false;
+            this.left = false;
+            this.backward = false;
+        }
 
     }
 
     moveCharacter(t) {
         let angle = 0;
         const mov_velocity = .5;
-        const mov_acceleratetion = 0.5;
+        const mov_acceleration = 0.25;
         const jump_velocity = 6;
-        let character_v = mov_velocity - mov_acceleratetion*t;
+        let character_v = mov_velocity - mov_acceleration;
         const g = 2;
 
         if (this.forward) {
-            this.z_pos = character_v * t;
+            this.z_pos += character_v;
+            this.backward = false;
         }
 
         if (this.backward) {
-            this.z_pos = -(character_v * t);
+            this.z_pos -= character_v;
+            //this.forward = false;
+            //this.stopMovement('backward');
         }
 
         if (this.right) {
-            this.x_pos = character_v * t;
+            this.x_pos -= character_v;
+            //this.left = false;
+            // this.right = !this.right;
         }
 
         if (this.left) {
-            this.x_pos = -(character_v * t);
+            this.x_pos += character_v;
+            //this.right = false;
+            //this.stopMovement('left');
+            // this.left = !this.left;
         }
 
         if (this.jump) {
-            const start_y = this.y_pos;
+            let init_y = this.y_pos;
+            let curr_y = jump_velocity - g;
             this.y_pos = jump_velocity - (g*t);
-            if (start_y === this.y_pos) {
+            /*
+            if (start_y <= this.y_pos) {
                 this.jump = !this.jump;
             }
+            */
         }
 
         /*                                                                      

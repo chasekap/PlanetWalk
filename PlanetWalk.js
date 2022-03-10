@@ -39,6 +39,7 @@ export class PlanetWalk extends Scene {
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.currentAngle = 0;
+        this.move = 0;
     }
 
   
@@ -50,7 +51,7 @@ export class PlanetWalk extends Scene {
                 program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 1000 ));
             }
             if (shape.trail){
-                console.log(shape.trail)
+                // console.log(shape.trail)
                 this.drawShapes(shape.trail, context,program_state,model_transform)
             }
 
@@ -69,29 +70,34 @@ export class PlanetWalk extends Scene {
         // move forward with 'i'
         this.key_triggered_button("Move forward", ["i"], () => {
             this.character.forward = !this.character.forward;
+            this.move = !this.move;
         });
         this.new_line();
 
         // move to the right with 'j'
         this.key_triggered_button("Move left", ["j"], () => {
-            this.character.left = !this.character.right;
+            this.character.left = !this.character.left;
+            this.move = !this.move;
         });
 
         // move to the right with 'l'
         this.key_triggered_button("Move right", ["l"], () => {
             this.character.right = !this.character.right;
+            this.move = !this.move;
         });
         this.new_line();
 
         // move back with 'k'
         this.key_triggered_button("Move backward", ["k"], () => {
             this.character.backward = !this.character.backward;
+            this.move = !this.move;
         });
         this.new_line();
 
         // jump with ';'
         this.key_triggered_button("Jump", [";"], () => {
             this.character.jump = !this.character.jump;
+            this.move = !this.move;
         });
         this.new_line();
 
@@ -114,6 +120,7 @@ export class PlanetWalk extends Scene {
         program_state.lights = [];
 
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+        this.character.time += 1;
 
         let model_transform_planet = Mat4.identity();
         let model_transform_character = model_transform_planet;
