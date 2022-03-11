@@ -88,9 +88,10 @@ export class ShootingStars{
     convertStarsToXYZShape(){
         return this.ShootingStars.map(star => {
             return {
-                x: star.r * Math.cos(star.phi) * Math.sin(star.theta), 
+                x: star.r * Math.cos(star.phi) * Math.sin(star.theta),
                 y: star.r * Math.sin(star.phi) * Math.sin(star.theta), 
-                z: star.r * Math.cos(star.theta), 
+                z: star.r * Math.cos(star.theta),
+                r: star.r,
                 color: star.color,
                 shape: this.shapes.star, 
                 material: this.material, 

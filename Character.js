@@ -10,7 +10,8 @@ export class Character {
     constructor() {
 
         this.PLANET_RADIUS = 3;
-        this.THETA = 0;
+        this.THETA = Math.PI / 2;
+        this.PHI = Math.PI / 2;
 
         this.shapes = {
             character_body: new Subdivision_Sphere(4),
@@ -26,11 +27,11 @@ export class Character {
 
         this.coordinates = {
             x: 0, 
-            y: 0, 
+            y: 1.1,
             z: 0, 
-            r: 1, 
-            phi: 0, 
-            theta: 0
+            r: 1.1,
+            phi: Math.PI / 2,
+            theta: Math.PI / 2
         }
 
         this.forward = 0;
@@ -70,14 +71,28 @@ export class Character {
 
     moveCharacter() {
         
-        if (this.forward || this.right) {
+        if (this.forward) {
             this.THETA += 0.03;
+            this.coordinates.theta -= 0.03;
+        }
+        if (this.right) {
+            this.PHI += 0.03;
+            this.coordinates.phi -= 0.03;
         }
 
-        if (this.backward || this.left) {
+        if (this.backward) {
             this.THETA -= 0.03;
+            this.coordinates.theta += 0.03;
         }
+        if (this.left) {
+            this.PHI -= 0.03;
+            this.coordinates.phi += 0.03;
+        }
+        this.coordinates.x = this.coordinates.r * Math.cos(this.coordinates.phi) * Math.sin(this.coordinates.theta);
+        this.coordinates.y = this.coordinates.r * Math.sin(this.coordinates.phi) * Math.sin(this.coordinates.theta);
+        this.coordinates.z = this.coordinates.r * Math.cos(this.coordinates.theta);
+        //console.log(this.coordinates);
+        return {for: this.THETA, side: this.PHI};
 
-        return this.THETA;
     }
 }

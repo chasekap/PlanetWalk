@@ -36,6 +36,8 @@ export class PlanetWalk extends Scene {
 
         this.prevMove = 0;
         this.prevAngle = 0;
+        this.prevPhi = 0;
+        this.invincible = 0;
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.currentAngle = 0;
@@ -44,18 +46,28 @@ export class PlanetWalk extends Scene {
 
     withinDistance(a,b, distance){
         //console.log( Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y)**2 - (a.z - b.z)**2))
-        return Math.sqrt((a.x - b.x) + (a.y - b.y)**2 - (a.z - b.z)**2) < distance; 
+        return ((Math.sqrt((a.x - b.x)**2 +
+            (a.y - b.y)**2 + (a.z - b.z)**2)  < distance) && (Math.abs(b.r - 1.1) < 0.15));
     }
     
     detectCollision(distance){
         this.shootingStars.getStars().forEach(star => {
             if (this.withinDistance(this.character.getCoords(), star, distance)){
-                this.collisions++;
-                alert("Collision!");
-                if (this.collisions >= 5) {
-                    alert("Too many collisions! Game over :( \n Would you like to restart?");
-                    this.collisions = 0;
+                if (this.invincible) {
+                    console.log("you're invincible");
                 }
+                else {
+                    this.collisions++;
+                    alert("Collision!");
+                    console.log(this.character.getCoords());
+                    console.log(star);
+                    this.invincible = 100;
+                    if (this.collisions >= 5) {
+                        alert("Too many collisions! Game over :( \n Would you like to restart?");
+                        this.collisions = 0;
+                    }
+                }
+
             }
         })
     }
@@ -139,6 +151,7 @@ export class PlanetWalk extends Scene {
         this.key_triggered_button("Move forward", ["i"], () => {
             this.getPrev();
             this.prevAngle = this.character.THETA;
+            this.prevPhi = this.character.PHI;
             this.character.forward = !this.character.forward;
             this.stopMovement('forward');
         });
@@ -148,6 +161,7 @@ export class PlanetWalk extends Scene {
         this.key_triggered_button("Move left", ["j"], () => {
             this.getPrev();
             this.prevAngle = this.character.THETA;
+            this.prevPhi = this.character.PHI;
             this.character.left = !this.character.left;
             this.stopMovement('left');
         });
@@ -156,6 +170,7 @@ export class PlanetWalk extends Scene {
         this.key_triggered_button("Move right", ["l"], () => {
             this.getPrev();
             this.prevAngle = this.character.THETA;
+            this.prevPhi = this.character.PHI;
             this.character.right = !this.character.right;
             this.stopMovement('right');
         });
@@ -165,6 +180,7 @@ export class PlanetWalk extends Scene {
         this.key_triggered_button("Move backward", ["k"], () => {
             this.getPrev();
             this.prevAngle = this.character.THETA;
+            this.prevPhi = this.character.PHI;
             this.character.backward = !this.character.backward;
             this.stopMovement('backward');
         });
@@ -174,6 +190,7 @@ export class PlanetWalk extends Scene {
         this.key_triggered_button("Jump", [";"], () => {
             this.getPrev();
             this.prevAngle = this.character.THETA;
+            this.prevPhi = this.character.PHI;
             this.character.jump = !this.character.jump;
         });
         this.new_line();
@@ -198,35 +215,44 @@ export class PlanetWalk extends Scene {
 
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         this.character.time += 1;
-
+        if (this.invincible) {
+            this.invincible -= 1;
+            if (this.invincible == 0) {
+                console.log("Not anymore!");
+            }
+        }
         let model_transform_planet = Mat4.identity();
         let model_transform_character = model_transform_planet;
 
-        let angle = this.character.moveCharacter();
+        let angle = this.character.moveCharacter().for;
+        let phi = this.character.moveCharacter().side;
 
         // transform character
         model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1));
 
         if (this.prevMove !== null) {
 
-            if (this.prevMove === 'forward' || this.prevMove === 'backward'){
-                model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 0)));
-            }
-
-            else if (this.prevMove === 'right' || this.prevMove === 'left'){
-                model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 90)));
-            }
+            // if (this.prevMove === 'forward' || this.prevMove === 'backward'){
+            //     model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 0)));
+            // }
+            //
+            // else if (this.prevMove === 'right' || this.prevMove === 'left'){
+            //     model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 90)));
+            // }
+            // model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 0)));
+            // model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevPhi, 0, 0, 1)));
 
         }
 
-        if (this.character.forward || this.character.backward){
-            model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle, 1, 0, 0)));
-        }
-
-        else if (this.character.right || this.character.left) {
-            model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle, 1, 0, 90)));
-        }
-
+        // if (this.character.forward || this.character.backward){
+        //     model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle, 1, 0, 0)));
+        // }
+        //
+        // else if (this.character.right || this.character.left) {
+        //     model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle, 1, 0, 90)));
+        // }
+        model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle - Math.PI / 2, 1, 0, 0)));
+        model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(phi - Math.PI / 2, 0, 0, 1)));
         if (this.character.jump) {
             let jump_angle = this.character.jumpCharacter();
             model_transform_planet = model_transform_planet.times(Mat4.scale(jump_angle, jump_angle, jump_angle));
@@ -249,7 +275,7 @@ export class PlanetWalk extends Scene {
         this.drawShapes(this.suns.stars, context, program_state, model_transform_planet);
         this.suns.updatePosition();
         this.shootingStars.moveStars();
-        this.detectCollision(0.1);
+        this.detectCollision(0.2);
     
        
         this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
