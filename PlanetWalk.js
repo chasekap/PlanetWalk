@@ -39,7 +39,8 @@ export class PlanetWalk extends Scene {
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.currentAngle = 0;
-        this.move = 0;
+        this.prevMove = 0;
+        this.prevAngle = 0;
     }
 
   
@@ -65,39 +66,98 @@ export class PlanetWalk extends Scene {
             model_transform = model_transform.times(Mat4.translation(-1*shape.x,-1*shape.y,-1*shape.z));
         })
     }
+
+    getPrev(){
+        if (this.character.forward || this.character.backward || this.character.left || this.character.right){
+            if (this.character.forward){
+                this.prevMove = 'forward';
+            }
+
+            else if (this.character.backward){
+                this.prevMove = 'backward';
+            }
+
+            else if (this.character.left){
+                this.prevMove = 'left';
+            }
+
+            else if (this.character.right){
+                this.prevMove = 'right';
+            }
+        }
+
+        else {
+            this.prevMove = null;
+        }
+    }
+
+    stopMovement(move){
+
+        if (move === 'forward'){
+            this.character.backward = 0;
+            this.character.left = 0;
+            this.character.right = 0;
+        }
+
+        else if (move === 'backward'){
+            this.character.forward = 0;
+            this.character.left = 0;
+            this.character.right = 0;
+        }
+
+        else if (move === 'left'){
+            this.character.forward = 0;
+            this.character.backward = 0;
+            this.character.right = 0;
+        }
+
+        else if (move === 'right'){
+            this.character.forward = 0;
+            this.character.left = 0;
+            this.character.backward = 0;
+        }
+    }
+
     // control panel for movement back and forth
     make_control_panel() {
         // move forward with 'i'
         this.key_triggered_button("Move forward", ["i"], () => {
+            this.getPrev();
+            this.prevAngle = this.character.THETA;
             this.character.forward = !this.character.forward;
-            this.move = !this.move;
+            this.stopMovement('forward');
         });
         this.new_line();
 
         // move to the right with 'j'
         this.key_triggered_button("Move left", ["j"], () => {
+            this.getPrev();
+            this.prevAngle = this.character.THETA;
             this.character.left = !this.character.left;
-            this.move = !this.move;
+            this.stopMovement('left');
         });
 
         // move to the right with 'l'
         this.key_triggered_button("Move right", ["l"], () => {
+            this.getPrev();
+            this.prevAngle = this.character.THETA;
             this.character.right = !this.character.right;
-            this.move = !this.move;
+            this.stopMovement('right');
         });
         this.new_line();
 
         // move back with 'k'
         this.key_triggered_button("Move backward", ["k"], () => {
+            this.getPrev();
+            this.prevAngle = this.character.THETA;
             this.character.backward = !this.character.backward;
-            this.move = !this.move;
+            this.stopMovement('backward');
         });
         this.new_line();
 
         // jump with ';'
         this.key_triggered_button("Jump", [";"], () => {
             this.character.jump = !this.character.jump;
-            this.move = !this.move;
         });
         this.new_line();
 
@@ -125,13 +185,35 @@ export class PlanetWalk extends Scene {
         let model_transform_planet = Mat4.identity();
         let model_transform_character = model_transform_planet;
 
-        // transform character
-        model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1))
-                                                             .times(Mat4.rotation(this.currentAngle, 1, 0, 0))
-                                                             .times(Mat4.translation(0,11,0));
+        let angle = this.character.moveCharacter(t);
 
-        let move_pos = this.character.moveCharacter(t);
-        model_transform_character = model_transform_character.times(Mat4.translation(move_pos.x, move_pos.y, move_pos.z));
+        // transform character
+        model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1));
+
+        console.log(this.prevAngle)
+        console.log(this.prevMove)
+
+        if (this.prevMove !== null) {
+
+            if (this.prevMove === 'forward' || this.prevMove === 'backward'){
+                model_transform_character = model_transform_character.times(Mat4.rotation(this.prevAngle, 1, 0, 0));
+            }
+
+            else if (this.prevMove === 'right' || this.prevMove === 'left'){
+                model_transform_character = model_transform_character.times(Mat4.rotation(this.prevAngle, 1, 0, 90));
+            }
+
+        }
+
+        if (this.character.forward || this.character.backward){
+            model_transform_character = model_transform_character.times(Mat4.rotation(angle, 1, 0, 0));
+        }
+
+        else if (this.character.right || this.character.left) {
+            model_transform_character = model_transform_character.times(Mat4.rotation(angle, 1, 0, 90));
+        }
+
+        model_transform_character = model_transform_character.times(Mat4.translation(0,11,0));
                                                                     
         // transform head on character
         let model_transform_character_head = model_transform_character;
@@ -142,18 +224,12 @@ export class PlanetWalk extends Scene {
         this.character.shapes.character_body.draw(context, program_state, model_transform_character, this.character.materials.character);
         this.character.shapes.character_head.draw(context, program_state, model_transform_character_head, this.character.materials.character);
 
-        // don't know if the planet position was changed so i'll use the other one
-        // this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffffff")}));
         this.shootingStars.rngStars();
-        
         this.drawShapes(this.shootingStars.getStars(), context, program_state, model_transform_planet);
         this.drawShapes(this.suns.getSuns(), context, program_state, model_transform_planet);
         this.drawShapes(this.suns.stars, context, program_state, model_transform_planet);
-        
         this.suns.updatePosition();
         this.shootingStars.moveStars();
-    
-       
         this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
 
     }

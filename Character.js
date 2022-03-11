@@ -1,4 +1,3 @@
-
 import {defs, tiny} from './examples/common.js';
 
 const {
@@ -10,7 +9,8 @@ const {Phong_Shader, Subdivision_Sphere} = defs;
 export class Character {
     constructor() {
 
-        this.planet_r = 1;
+        this.PLANET_RADIUS = 3;
+        this.THETA = 0;
 
         this.shapes = {
             character_body: new Subdivision_Sphere(4),
@@ -24,11 +24,11 @@ export class Character {
             })
         }
 
-        this.forward = false;
-        this.backward = false;
-        this.right = false;
-        this.left = false;
-        this.jump = false;
+        this.forward = 0;
+        this.backward = 0;
+        this.right = 0;
+        this.left = 0;
+        this.jump = 0;
 
         this.x_pos = 0;
         this.y_pos = 0;
@@ -37,64 +37,20 @@ export class Character {
         this.time = 0;
     }
 
-    stopMovement(move){
-
-        if (move === 'forward'){
-            this.backward = false;
-            this.left = false;
-            this.right = false;
-        }
-
-        if (move === 'backward'){
-            this.forward = false;
-            this.left = false;
-            this.right = false;
-        }
-
-        if (move === 'left'){
-            this.forward = false;
-            this.backward = false;
-            this.right = false;
-        }
-
-        if (move === 'right'){
-            this.forward = false;
-            this.left = false;
-            this.backward = false;
-        }
-
-    }
-
     moveCharacter(t) {
-        let angle = 0;
+        
         const mov_velocity = .5;
         const mov_acceleration = 0.25;
         const jump_velocity = 6;
         let character_v = mov_velocity - mov_acceleration;
         const g = 2;
-
-        if (this.forward) {
-            this.z_pos += character_v;
-            this.backward = false;
+        
+        if (this.forward || this.right) {
+            this.THETA += 0.03;
         }
 
-        if (this.backward) {
-            this.z_pos -= character_v;
-            //this.forward = false;
-            //this.stopMovement('backward');
-        }
-
-        if (this.right) {
-            this.x_pos -= character_v;
-            //this.left = false;
-            // this.right = !this.right;
-        }
-
-        if (this.left) {
-            this.x_pos += character_v;
-            //this.right = false;
-            //this.stopMovement('left');
-            // this.left = !this.left;
+        if (this.backward || this.left) {
+            this.THETA -= 0.03;
         }
 
         if (this.jump) {
@@ -107,6 +63,8 @@ export class Character {
             }
             */
         }
+
+        return this.THETA;
 
         /*                                                                      
 
@@ -160,11 +118,14 @@ export class Character {
         }
 
         */
-
-        return this.convertCharacterToSpherical(this.x_pos, this.y_pos, this.z_pos);
     }
-
-    convertCharacterToSpherical(x,y,z) {
-        return {x,y,z}
+    /*
+    convertCharacterToSpherical() {
+        return {
+            x: this.PLANET_RADIUS * Math.cos(this.PHI) * Math.sin(this.THETA),
+            y: this.PLANET_RADIUS * Math.sin(this.PHI) * Math.sin(this.THETA),
+            z: this.PLANET_RADIUS * Math.cos(this.THETA)
+        };
     }
+    */
 }
