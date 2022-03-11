@@ -17,10 +17,7 @@ export class PlanetWalk extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
-
-        // TODO:  Create two cubes, including one with the default texture coordinates (from 0 to 1), and one with the modified
-        //        texture coordinates as required for cube #2.  You can either do this by modifying the cube code or by modifying
-        //        a cube instance's texture_coords after it is already created.
+        
         this.suns = new Suns(); 
         this.shootingStars = new ShootingStars(); 
         this.character = new Character();
@@ -232,7 +229,7 @@ export class PlanetWalk extends Scene {
 
         if (this.character.jump) {
             let jump_angle = this.character.jumpCharacter();
-            model_transform_planet = model_transform_character.times(Mat4.scale(jump_angle, jump_angle, jump_angle));
+            model_transform_planet = model_transform_planet.times(Mat4.scale(jump_angle, jump_angle, jump_angle));
         }
 
         model_transform_character = model_transform_character.times(Mat4.translation(0,11,0));

@@ -39,7 +39,7 @@ export class Character {
         this.left = 0;
         this.jump = 0;
 
-        this.temp = 10;
+        this.temp = 1;
         this.jump_v = 0;
         this.downwards = false;
     }
@@ -49,18 +49,18 @@ export class Character {
     }
 
     jumpCharacter() {
-        if (this.temp <= 10 && this.temp >= 8 && !this.downwards){
-            this.jump_v += 0.005;
+        if (this.temp <= 1 && this.temp >= .8 && !this.downwards){
+            this.jump_v += 0.001;
             this.temp -= this.jump_v;
-            if (this.temp <= 8){
+            if (this.temp <= .8){
                 this.downwards = true;
             }
         } else {
-            this.jump_v += 0.005;
+            this.jump_v += 0.001;
             this.temp += this.jump_v;
-            if (this.temp >= 10){
+            if (this.temp >= 1){
                 this.jump = false;
-                this.temp = 10;
+                this.temp = 1;
                 this.downwards = false; 
                 this.jump_v = 0;
             }
