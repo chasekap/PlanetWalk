@@ -275,7 +275,7 @@ export class PlanetWalk extends Scene {
         this.drawShapes(this.suns.stars, context, program_state, model_transform_planet);
         this.suns.updatePosition();
         this.shootingStars.moveStars();
-        this.detectCollision(0.2);
+        this.detectCollision(0.15);
     
        
         this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
