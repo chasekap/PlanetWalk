@@ -37,13 +37,31 @@ export class PlanetWalk extends Scene {
             })
         }
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
-        this.currentAngle = 0;
         this.prevMove = 0;
         this.prevAngle = 0;
+
+        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.currentAngle = 0;
+        this.collisions = 0;
     }
 
-  
+    withinDistance(a,b, distance){
+        //console.log( Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y)**2 - (a.z - b.z)**2))
+        return Math.sqrt((a.x - b.x) + (a.y - b.y)**2 - (a.z - b.z)**2) < distance; 
+    }
+    
+    detectCollision(distance){
+        this.shootingStars.getStars().forEach(star => {
+            if (this.withinDistance(this.character.getCoords(), star, distance)){
+                this.collisions++;
+                alert("Collision!");
+                if (this.collisions >= 5) {
+                    alert("Too many collisions! Game over :( \n Would you like to restart?");
+                    this.collisions = 0;
+                }
+            }
+        })
+    }
     drawShapes(listOfShapes, context, program_state, model_transform){
        
         listOfShapes.forEach((shape) => {
@@ -52,7 +70,7 @@ export class PlanetWalk extends Scene {
                 program_state.lights.push(new Light(vec4(shape.x,shape.y,shape.z, 1), color(1, 1, 1, 1), 1000 ));
             }
             if (shape.trail){
-                // console.log(shape.trail)
+        
                 this.drawShapes(shape.trail, context,program_state,model_transform)
             }
 
@@ -230,6 +248,9 @@ export class PlanetWalk extends Scene {
         this.drawShapes(this.suns.stars, context, program_state, model_transform_planet);
         this.suns.updatePosition();
         this.shootingStars.moveStars();
+        this.detectCollision(0.1);
+    
+       
         this.shapes.Planet.draw(context, program_state, model_transform_planet, this.materials.planet_surface.override({color: hex_color("#ffff00")}));
 
     }

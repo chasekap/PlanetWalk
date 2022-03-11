@@ -10,7 +10,7 @@ const {Cube, Phong_Shader, Subdivision_Sphere} = defs
 
 export class ShootingStars{
     constructor() {
-    this.SPAWN_RATE = 0.5 / 30
+    this.SPAWN_RATE = 5 / 30
     this.PHI_VARIATION = 0
     this.THETA_VARIATION = 0.01
     this.TRAIL_RATE = 0.9
