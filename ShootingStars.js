@@ -15,7 +15,8 @@ export class ShootingStars{
     this.THETA_VARIATION = 0.01
     this.TRAIL_RATE = 0.9
     this.PLANET_RADIUS = 1 
-    this.Velocity = 0.1
+    this.Velocity = 0.05
+    this.gravity = 0.001
     this.atmosphere_radius = 5
     this.ShootingStars = []
     this.shapes = {
@@ -37,6 +38,7 @@ export class ShootingStars{
                theta: Math.random() * Math.PI * 2 , 
                phi: Math.random() * Math.PI, 
                color: Color.of(Math.max(Math.random(), 0.9), Math.max(Math.random(), 0.9),Math.max(Math.random(), 0.9),1), 
+               Velocity: this.Velocity
                
            }
            star.trail =  this.generateTrail(star.r,star.theta,star.phi)
@@ -47,12 +49,12 @@ export class ShootingStars{
         
         this.ShootingStars = this.ShootingStars.filter(star => {return this.PLANET_RADIUS < star.r})
         .map(star => {
-            return {...star, r: star.r - this.Velocity, trail: this.moveTrail(star)}
+            return {...star, r: star.r - star.Velocity, trail: this.moveTrail(star), Velocity: star.Velocity + this.gravity}
         })
     }
     moveTrail(star){
         return star.trail.map(particle => {
-            const r = particle.r - this.Velocity
+            const r = particle.r - star.Velocity
             const phi =  particle.phi + this.PHI_VARIATION * Math.random() - this.PHI_VARIATION * Math.random();
             const theta =  particle.theta + this.THETA_VARIATION * Math.random() - this.THETA_VARIATION * Math.random();
             return {...particle, r: r, phi: phi, theta: theta,
