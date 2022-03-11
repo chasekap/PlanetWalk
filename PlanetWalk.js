@@ -175,6 +175,8 @@ export class PlanetWalk extends Scene {
 
         // jump with ';'
         this.key_triggered_button("Jump", [";"], () => {
+            this.getPrev();
+            this.prevAngle = this.character.THETA;
             this.character.jump = !this.character.jump;
         });
         this.new_line();
@@ -203,32 +205,34 @@ export class PlanetWalk extends Scene {
         let model_transform_planet = Mat4.identity();
         let model_transform_character = model_transform_planet;
 
-        let angle = this.character.moveCharacter(t);
+        let angle = this.character.moveCharacter();
 
         // transform character
         model_transform_character = model_transform_character.times(Mat4.scale(0.1,0.1,0.1));
 
-        console.log(this.prevAngle)
-        console.log(this.prevMove)
-
         if (this.prevMove !== null) {
 
             if (this.prevMove === 'forward' || this.prevMove === 'backward'){
-                model_transform_character = model_transform_character.times(Mat4.rotation(this.prevAngle, 1, 0, 0));
+                model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 0)));
             }
 
             else if (this.prevMove === 'right' || this.prevMove === 'left'){
-                model_transform_character = model_transform_character.times(Mat4.rotation(this.prevAngle, 1, 0, 90));
+                model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(this.prevAngle, 1, 0, 90)));
             }
 
         }
 
         if (this.character.forward || this.character.backward){
-            model_transform_character = model_transform_character.times(Mat4.rotation(angle, 1, 0, 0));
+            model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle, 1, 0, 0)));
         }
 
         else if (this.character.right || this.character.left) {
-            model_transform_character = model_transform_character.times(Mat4.rotation(angle, 1, 0, 90));
+            model_transform_planet = model_transform_planet.times(Mat4.inverse(Mat4.rotation(angle, 1, 0, 90)));
+        }
+
+        if (this.character.jump) {
+            let jump_angle = this.character.jumpCharacter();
+            model_transform_planet = model_transform_character.times(Mat4.scale(jump_angle, jump_angle, jump_angle));
         }
 
         model_transform_character = model_transform_character.times(Mat4.translation(0,11,0));
